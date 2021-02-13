@@ -44,4 +44,7 @@ contract Auction{
      function get_team_details(address _team_address) public view returns(address,uint,string memory){
         return db.team_details(_team_address);
     }
+    
+    
+    
 }
