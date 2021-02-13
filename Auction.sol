@@ -1,104 +1,47 @@
 pragma solidity ^0.8.0;
 
-contract auction{
-   
-    address manager;
-   
-    //TEAM DATA
-    uint bidCounter;  
-    string playerType;
-    uint budget;
-    bool playerSelectedFlagVal;
+interface database{
+    function playerRegistration(address _player_id, uint _base_price, uint _age, string memory _player_type) external;
+    function teamRegistration(address _team_id, string memory _team_name) external;
     
-    uint count=0;
-   
-    //PLAYER DATA
-    uint bidUpBy;
-    address temp_player_id;
+    function player_details(address _return_player_id) external view returns(address,uint,uint,string memory);
+    function team_details(address _return_team_id) external view returns(address,uint,string memory);
+}
 
-   
-    struct Player{
-         address p_id;
-         uint basePrice;
-         uint rating;
-         string playerType;
-    }
-   
-    struct Team{
-         address t_id;
-         string teamName;
-         address[15] playerSelected;
-    }
-   Team teamData;
-
-   
-    struct manageBidData{
-        address teamAddress;
-        uint bidAmount;
-    }
-
-    constructor () public {
-        manager = msg.sender;
-    }
-   
-    mapping(address=>Team)team;
-    mapping(address=>Player)player;
-    mapping(address=>bool) userType;
-    mapping(address=>manageBidData)manage;
-   
-   
-    function PlayerRegistration(uint _baseprice, uint _rating, string memory _playerType) public {
-        require(manager!=msg.sender, "Manager Cannot Be Team");
-        require(player[msg.sender].p_id == address(0), "Player already Registered");
-        Player memory playerData = Player(msg.sender, _baseprice, _rating, _playerType);
-       
-        userType[msg.sender] = true;
-       
-    }
-   
-    function TeamRegistration(string memory _teamName) public {
-        
-        require(manager!=msg.sender, "Manager Cannot Be Team");    
-        require(team[msg.sender].t_id == address(0), "Team already Registered");
-        teamData.t_id=msg.sender;
-        teamData.teamName = _teamName;
-        
-        userType[msg.sender] = false;
-       
-    }
-   
-    function startBid(address playerID) public{
-        require(msg.sender==manager,"You are not Auction manager");
-        temp_player_id = playerID;
-        playerSelectedFlagVal=false;
-        bidCounter=0;
-    }
-   
-    function setBidUpBy(uint _bidUpBy) public {
-        require(msg.sender==manager,"You are not Auction manager");
-        bidUpBy=_bidUpBy;
-    }
-   
-    function BID(uint _amount)public{
-        require(userType[msg.sender] == false, "Team Not Registered to BID");
-        require(playerSelectedFlagVal==false, "Bid is Over On This Player...PLAYER SELECTED");
-        
-        require(_amount>=player[temp_player_id].basePrice,"Amount is less than base price");
-        require(bidUpBy > 0,"Set Bid Up Value Greater than 0");
-        manage[msg.sender].teamAddress = msg.sender;
-        manage[msg.sender].bidAmount = _amount;
-        bidCounter+=1;
-        
-        if(bidCounter==5)
-        {
-            teamData.playerSelected[count];
-            count+=1;
-            playerSelectedFlag();
-        }
+contract Auction{
+    address player_id;
+    uint base_price;
+    uint age;
+    string player_type;
+    
+    uint[] player_fetched_data;
+    
+    address auction_manager;
+    
+    constructor () public payable  {
+        auction_manager = msg.sender;
     }
     
-    function playerSelectedFlag() private{
-        playerSelectedFlagVal=!playerSelectedFlagVal;
+    database db;
+    
+    function set_DB(address db_address) public returns(address){
+        db=database(db_address);
+        return db_address;
+    }
+    
+    function register_player(uint _base_price, uint _age, string memory _player_type)public payable{
+        db.playerRegistration(msg.sender,_base_price,_age,_player_type);
+    }
+    
+    function register_team(string memory _team_name)public payable{
+        db.teamRegistration(msg.sender,_team_name);
     }
 
+    function get_player_details(address _player_address) public view returns(address,uint,uint,string memory){
+        return db.player_details(_player_address);
+    }
+    
+     function get_team_details(address _team_address) public view returns(address,uint,string memory){
+        return db.team_details(_team_address);
+    }
 }
