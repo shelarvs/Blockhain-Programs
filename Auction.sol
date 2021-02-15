@@ -27,6 +27,10 @@ contract Auction{
     uint bid_up_by=0;
     
     address bidder_data;
+    
+    address bidder_prev_data;
+    uint bidder_prev_amount;
+    
     uint bidder_amount;
     uint bidder_count=0;
     bool isBidOn=false;
@@ -76,6 +80,10 @@ contract Auction{
     
     function bid()public payable{
         require(isBidOn==true,"No Player on Bid");
+        
+        bidder_prev_data = bidder_data;
+        bidder_prev_amount = bidder_amount;
+        
         if(bidder_count<5){
             if(previous_bid_value<msg.value){
                 payable(bidder_data).transfer(bidder_amount);
@@ -89,6 +97,7 @@ contract Auction{
         else{
             //db.set_selected_player(bidder_data, player_id_on_bid);
             payable(player_id_on_bid).transfer(bidder_amount);
+            payable(bidder_prev_data).transfer(bidder_prev_amount);
             bidder_count=0;
             isBidOn=false;
         }
