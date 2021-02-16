@@ -78,19 +78,13 @@ contract database{
          return map_team[_return_team_id].team_name;
      }
      
-     function get_team_players_selected(address _return_team_id) public view returns(address){
-        uint i;
-        require(count == 0, "Players Not Selected Yet");
-        for(i=0;i<=count;i++)
-            {
-                return map_team[_return_team_id].team_players[i];
-            }
-     }
+         function get_team_players_selected(address _return_team_id) public view returns(address[] memory){
+            require(count != 0, "Players Not Selected Yet");
+            return map_team[_return_team_id].team_players;
+         }
      
      function set_selected_player(address team_id ,address _selected_player_id) public{
         map_team[team_id].team_players.push(_selected_player_id);
         count+=1;
      }
-     
- 
 }
