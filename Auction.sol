@@ -95,7 +95,7 @@ contract Auction{
             }
         }
         else{
-            //db.set_selected_player(bidder_data, player_id_on_bid);
+            db.set_selected_player(bidder_data, player_id_on_bid);
             payable(player_id_on_bid).transfer(bidder_amount);
             payable(bidder_prev_data).transfer(bidder_prev_amount);
             bidder_count=0;
@@ -111,7 +111,7 @@ contract Auction{
         return (bidder_data,previous_bid_value);
     }
     
-      function player_on_bid_id() public view returns(address){
+    function player_on_bid_id() public view returns(address){
          return player_id_on_bid;
-     }
+    }
 }
